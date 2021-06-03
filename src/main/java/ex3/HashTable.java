@@ -1,4 +1,4 @@
-package ex2;
+package ex3;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,6 @@ public class HashTable {
      */
     public void put(String key, String value) {
         int hash = getHash(key);
-        if(hash < 0) hash = hash * -1; //Código para que put funcione siempre
         final HashEntry hashEntry = new HashEntry(key, value);
 
         if(entries[hash] == null) {
@@ -51,15 +50,20 @@ public class HashTable {
     public String get(String key) {
         int hash = getHash(key);
         if(entries[hash] != null) {
-            HashEntry temp = entries[hash];
-
-            while( !temp.key.equals(key))
-                temp = temp.next;
+            HashEntry temp = getHashEntry(key, entries[hash]);
 
             return temp.value;
         }
 
         return null;
+    }
+
+    private HashEntry getHashEntry(String key, HashEntry entry) {
+        HashEntry temp = entry;
+
+        while (!temp.key.equals(key))
+            temp = temp.next;
+        return temp;
     }
 
     /**
@@ -71,9 +75,7 @@ public class HashTable {
 
         if(entries[hash] != null) {
 
-            HashEntry temp = entries[hash];
-             while( !temp.key.equals(key))
-                temp = temp.next;
+            HashEntry temp = getHashEntry(key, entries[hash]);
 
             if(temp.prev == null) entries[hash] = null;             //esborrar element únic (no col·lissió)
             else{
@@ -82,6 +84,7 @@ public class HashTable {
             }
             ITEMS--; //Se elimina un elemento el contador decrece.
         }
+
     }
 
     private int getHash(String key) {
@@ -209,21 +212,6 @@ public class HashTable {
         }
 
         return  foundKeys;
-    }
-
-    public static void main(String[] args) {
-        HashTable hashTable = new HashTable();
-
-        // Put some key values.
-        for(int i=0; i<30; i++) {
-            final String key = String.valueOf(i);
-            hashTable.put(key, key);
-        }
-
-        // Print the HashTable structure
-        log("****   HashTable  ***");
-        log(hashTable.toString());
-        log("\nValue for key(20) : " + hashTable.get("20") );
     }
 
     private static void log(String msg) {

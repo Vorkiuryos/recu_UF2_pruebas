@@ -1,4 +1,4 @@
-package ex2;
+package ex4;
 
 import java.util.ArrayList;
 
@@ -24,9 +24,8 @@ public class HashTable {
      * @param key La clau de l'element a afegir.
      * @param value El propi element que es vol afegir.
      */
-    public void put(String key, String value) {
+    public void put(Object key, Object value) {
         int hash = getHash(key);
-        if(hash < 0) hash = hash * -1; //Código para que put funcione siempre
         final HashEntry hashEntry = new HashEntry(key, value);
 
         if(entries[hash] == null) {
@@ -48,13 +47,10 @@ public class HashTable {
      * @param key La clau de l'element a trobar.
      * @return El propi element que es busca (null si no s'ha trobat).
      */
-    public String get(String key) {
+    public Object get(Object key) {
         int hash = getHash(key);
         if(entries[hash] != null) {
-            HashEntry temp = entries[hash];
-
-            while( !temp.key.equals(key))
-                temp = temp.next;
+            HashEntry temp = getHashEntry(key, entries[hash]);
 
             return temp.value;
         }
@@ -62,18 +58,24 @@ public class HashTable {
         return null;
     }
 
+    private HashEntry getHashEntry(Object key, HashEntry entry) {
+        HashEntry temp = entry;
+
+        while (!temp.key.equals(key))
+            temp = temp.next;
+        return temp;
+    }
+
     /**
      * Permet esborrar un element dins de la taula.
      * @param key La clau de l'element a trobar.
      */
-    public void drop(String key) {
+    public void drop(Object key) {
         int hash = getHash(key);
 
         if(entries[hash] != null) {
 
-            HashEntry temp = entries[hash];
-             while( !temp.key.equals(key))
-                temp = temp.next;
+            HashEntry temp = getHashEntry(key, entries[hash]);
 
             if(temp.prev == null) entries[hash] = null;             //esborrar element únic (no col·lissió)
             else{
@@ -82,23 +84,24 @@ public class HashTable {
             }
             ITEMS--; //Se elimina un elemento el contador decrece.
         }
+
     }
 
-    private int getHash(String key) {
+    private int getHash(Object key) {
         // piggy backing on java string
         // hashcode implementation.
         return key.hashCode() % SIZE;
     }
 
     private class HashEntry {
-        String key;
-        String value;
+        Object key;
+        Object value;
 
         // Linked list of same hash entries.
         HashEntry next;
         HashEntry prev;
 
-        public HashEntry(String key, String value) {
+        public HashEntry(Object key, Object value) {
             this.key = key;
             this.value = value;
             this.next = null;
@@ -141,7 +144,7 @@ public class HashTable {
      * @param key La clau que es farà servir per calcular col·lisions.
      * @return Una clau que, de fer-se servir, provoca col·lisió amb la que s'ha donat.
      */
-    public String getCollisionsForKey(String key) {
+    public Object getCollisionsForKey(Object key) {
         return getCollisionsForKey(key, 1).get(0);
     }
 
@@ -151,7 +154,7 @@ public class HashTable {
      * @param quantity La quantitat de col·lisions a calcular.
      * @return Un llistat de claus que, de fer-se servir, provoquen col·lisió.
      */
-    public ArrayList<String> getCollisionsForKey(String key, int quantity){
+    public ArrayList<String> getCollisionsForKey(Object key, int quantity){
         /*
           Main idea:
           alphabet = {0, 1, 2}
@@ -209,21 +212,6 @@ public class HashTable {
         }
 
         return  foundKeys;
-    }
-
-    public static void main(String[] args) {
-        HashTable hashTable = new HashTable();
-
-        // Put some key values.
-        for(int i=0; i<30; i++) {
-            final String key = String.valueOf(i);
-            hashTable.put(key, key);
-        }
-
-        // Print the HashTable structure
-        log("****   HashTable  ***");
-        log(hashTable.toString());
-        log("\nValue for key(20) : " + hashTable.get("20") );
     }
 
     private static void log(String msg) {
