@@ -81,6 +81,7 @@ public class HashTable {
                 temp.prev.next = temp.next;                         //esborrem temp, per tant actualitzem el següent de l'anterior
             }
             ITEMS--; //Se elimina un elemento el contador decrece.
+
         }
     }
 
